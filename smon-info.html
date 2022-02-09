@@ -14,48 +14,21 @@
     <script type="text/babel">
         const root = document.getElementById("root");
 
-        function query() {
-            const [info, setInfos] = React.useState([]);
-            const account = 'tradingdieas'
-            console.log('query')
-            console.log('in useEffect')
-
-            const sm_balance = "https://api2.splinterlands.com/players/balances?username="
-            
-            console.log(sm_balance+account)
-            fetch(sm_balance+account)
-            .then((response) => response.json())
-            .then((json) => {
-                setInfos(json);
-                setLoading(false);
-            });
-            console.log('query out')
-        }
-
         function App() {
             const [loading, setLoading] = React.useState(-1);
             const [infos, setInfos] = React.useState([]);
+            const [cardInfos, setCardInfos] = React.useState([]);
 
-            const [account, setAccount] = React.useState("");
+            const [account, setAccount] = React.useState("tradingideas.spt");
             const onChange = (event) => setAccount(event.target.value);
-
-            console.log('here')
-
-            const onSubmit = (event) => {
-                console.log('onSubmit')
-                event.preventDefault();
-                if (account === "") {
-                    return;
-                }
-            };
 
             const onBalance = (event) => {
                 const sm_balance = "https://api2.splinterlands.com/players/balances?username="
                 fetch(sm_balance+account)
                 .then((response) => response.json())
                 .then((json) => {
-                    setInfos(json);
                     setLoading(2); // 2 : loading 완료
+                    setInfos(json);
                 });
             };
 
@@ -66,18 +39,22 @@
                 .then((json) => {
                     setInfos(json);
                     setLoading(3); // 3 : loading 완료
-                    <ul>
-                        {infos.map((info, index) => (
-                            <li key={index}>{info.completed_date}  {info.type}  :  Card {info.card_detail_id}  Price {info.buy_price}</li>
-                        ))}
-                    </ul>
                 });
             };
 
+            // run once at the first time
+            React.useEffect(() => {
+                const url = "https://steemmonsters.com/cards/get_details"
+                fetch(url)
+                .then((response) => response.json())
+                .then((json) => {
+                    setCardInfos(json);
+                });
+            }, []);
 
             return (
                 <div>
-                    <h1 style={{ color: 'blue',textAlign: 'center' }}> Market Transactions History </h1>
+                    <h1 style={{ color: 'black',textAlign: 'center' }}> Market Transactions History </h1>
                     <div align="center">
                         <input
                             position="center"
@@ -110,17 +87,12 @@
                         ) : (loading == 3 ? (
                                 <ul>
                                     {infos.map((info, index) => (
-                                        <li key={index}>{info.completed_date}  {info.purchaser==account? 'BUY ' : 'SELL'}  :  Card {info.card_detail_id}  Price {info.buy_price}</li>
+                                            <li key={index} style={{color: info.purchaser==account?'red':'blue'}}>{info.completed_date}  {info.purchaser==account? 'BUY ' : 'SELL'}  :  {cardInfos[info.card_detail_id - 1].name}   ${info.buy_price}</li>
                                     ))}
                                 </ul>
                             ): ""
                         ) 
                     }
-                    {
-                        loading == 2 ? console.log('2') : (loading==3 ? console.log(3) : console.log('else'))
-                    }
-
-
                 </div>
             );
         }
