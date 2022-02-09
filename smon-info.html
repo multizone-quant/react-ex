@@ -110,7 +110,7 @@
                         ) : (loading == 3 ? (
                                 <ul>
                                     {infos.map((info, index) => (
-                                        <li key={index}>{info.completed_date}  {info.type}  :  Card {info.card_detail_id}  Price {info.buy_price}</li>
+                                        <li key={index}>{info.completed_date}  {info.purchaser==account? 'BUY ' : 'SELL'}  :  Card {info.card_detail_id}  Price {info.buy_price}</li>
                                     ))}
                                 </ul>
                             ): ""
