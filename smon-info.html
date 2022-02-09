@@ -87,7 +87,7 @@
                         ) : (loading == 3 ? (
                                 <ul>
                                     {infos.map((info, index) => (
-                                            <li key={index} style={{color: info.purchaser==account?'red':'blue'}}>{info.completed_date}  {info.purchaser==account? 'BUY ' : 'SELL'}  :  {cardInfos[info.card_detail_id - 1].name}   ${info.buy_price}</li>
+                                            <li key={index} style={{color: info.purchaser==account?'red':'blue'}}>{new Date(info.completed_date).toLocaleString()}  {info.purchaser==account? 'BUY ' : 'SELL'}  :  {cardInfos[info.card_detail_id - 1].name}   ${info.buy_price}</li>
                                     ))}
                                 </ul>
                             ): ""
