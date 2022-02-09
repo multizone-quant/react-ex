@@ -1,0 +1,132 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+    <body>
+        <div id="root"></div>
+    </body>
+
+    <!-- 
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    -->
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+        const root = document.getElementById("root");
+
+        function query() {
+            const [info, setInfos] = React.useState([]);
+            const account = 'tradingdieas'
+            console.log('query')
+            console.log('in useEffect')
+
+            const sm_balance = "https://api2.splinterlands.com/players/balances?username="
+            
+            console.log(sm_balance+account)
+            fetch(sm_balance+account)
+            .then((response) => response.json())
+            .then((json) => {
+                setInfos(json);
+                setLoading(false);
+            });
+            console.log('query out')
+        }
+
+        function App() {
+            const [loading, setLoading] = React.useState(-1);
+            const [infos, setInfos] = React.useState([]);
+
+            const [account, setAccount] = React.useState("");
+            const onChange = (event) => setAccount(event.target.value);
+
+            console.log('here')
+
+            const onSubmit = (event) => {
+                console.log('onSubmit')
+                event.preventDefault();
+                if (account === "") {
+                    return;
+                }
+            };
+
+            const onBalance = (event) => {
+                const sm_balance = "https://api2.splinterlands.com/players/balances?username="
+                fetch(sm_balance+account)
+                .then((response) => response.json())
+                .then((json) => {
+                    setInfos(json);
+                    setLoading(2); // 2 : loading 완료
+                });
+            };
+
+            const onTrading = (event) => {
+                const sm_balance = "https://api2.splinterlands.com/market/history?player="
+                fetch(sm_balance+account)
+                .then((response) => response.json())
+                .then((json) => {
+                    setInfos(json);
+                    setLoading(3); // 3 : loading 완료
+                    <ul>
+                        {infos.map((info, index) => (
+                            <li key={index}>{info.completed_date}  {info.type}  :  Card {info.card_detail_id}  Price {info.buy_price}</li>
+                        ))}
+                    </ul>
+                });
+            };
+
+
+            return (
+                <div>
+                    <h1 style={{ color: 'blue',textAlign: 'center' }}> Market Transactions History </h1>
+                    <div align="center">
+                        <input
+                            position="center"
+                            onChange={onChange}
+                            value={account}
+                            type="text"
+                            placeholder="Enter account..."
+                            style={{textAlign: 'center' }}
+                        />
+                        <hr />
+                        <button onClick={onBalance}> Balance</button>
+                        <button onClick={onTrading}> Trade Info</button>
+                    </div>
+                    <hr />
+
+                    {
+                        loading < 2 ? (
+                            loading == 1?
+                                <strong>Loading...</strong>
+                            : ""  
+                        ) : ""
+                    }
+                    {
+                        loading == 2 ? (
+                            <ul>
+                                {infos.map((info, index) => (
+                                    <li key={index}>{info.token} : {info.balance}</li>
+                                ))}
+                            </ul>
+                        ) : (loading == 3 ? (
+                                <ul>
+                                    {infos.map((info, index) => (
+                                        <li key={index}>{info.completed_date}  {info.type}  :  Card {info.card_detail_id}  Price {info.buy_price}</li>
+                                    ))}
+                                </ul>
+                            ): ""
+                        ) 
+                    }
+                    {
+                        loading == 2 ? console.log('2') : (loading==3 ? console.log(3) : console.log('else'))
+                    }
+
+
+                </div>
+            );
+        }
+
+        ReactDOM.render(
+        <App />, root)
+    </script>
+    
+</html>        
