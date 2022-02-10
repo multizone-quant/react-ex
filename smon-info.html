@@ -15,29 +15,38 @@
         const root = document.getElementById("root");
 
         function GetDetailRewardInfo({data}) {
-            const res = JSON.parse(data.result)
-            const info = JSON.parse(data.data)
-
             var summary = { dec_total : 0, pack_total:0, card_total:0}
-
-            console.log('len', res.rewards.length)
-            for (var i=0; i < res.rewards.length; i++) {
-                console.log('qty', res.rewards[i].quantity)
-                const qty = res.rewards[i].quantity
-                const type = res.rewards[i].type
-                if (type=="dec") 
-                    summary.dec_total += qty
-                else if (type=="pack") 
-                    summary.pack_total += qty
-                else if (type=="reward_card") 
-                    summary.card_total += qty
+            console.log(data.success)
+            var suc = 'fail'
+            if (data.success ) {
+                console.log('true')
+                const res = JSON.parse(data.result)
+                const info = JSON.parse(data.data)
+                console.log('type', info.type)
+                suc = info.type 
+                console.log('len', res.rewards.length)
+                for (var i=0; i < res.rewards.length; i++) {
+                    console.log('qty', res.rewards[i].quantity)
+                    const qty = res.rewards[i].quantity
+                    const type = res.rewards[i].type
+                    if (type == "dec") 
+                        summary.dec_total += qty
+                    else if (type == "pack") 
+                        summary.pack_total += qty
+                    else if (type == "reward_card") 
+                        summary.card_total += qty
+                }
             }
+            var ret = 'fail'
+            if (suc != 'fail') 
+                ret = suc + " dec : " + String(summary.dec_total) + " card : " + String(summary.card_total) + " pack : " + String(summary.pack_total)
 
             console.log(summary)
             return (
-                info.type + " dec : " + String(summary.dec_total) + " card : " + String(summary.card_total) + " pack : " + String(summary.pack_total)
+                ret
             );
         }
+
         function App() {
             const [loading, setLoading] = React.useState(-1);
             const [infos, setInfos] = React.useState([]);
