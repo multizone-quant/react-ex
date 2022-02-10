@@ -141,7 +141,9 @@
                             rewardInfos.length > 0 ? (
                                 <ul>
                                     {rewardInfos.map((info, index) => (
-                                            <li key={index} > {new Date(info.created_date).toLocaleString()} <GetDetailRewardInfo data={info} /> </li>
+                                            info.success ? 
+                                                <li key={index} > {new Date(info.created_date).toLocaleString()} <GetDetailRewardInfo data={info} /> </li>
+                                            :""
 
                                     ))}
                                 </ul>
