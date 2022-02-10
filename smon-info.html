@@ -14,34 +14,26 @@
     <script type="text/babel">
         const root = document.getElementById("root");
 
-        function GetDetailRewardInfo({data}) {
-            var summary = { dec_total : 0, pack_total:0, card_total:0}
-            console.log(data.success)
+        function GetDetailRewardInfo({data, kind}) {
+            var sum = 0
             var suc = 'fail'
             if (data.success ) {
-                console.log('true')
                 const res = JSON.parse(data.result)
                 const info = JSON.parse(data.data)
-                console.log('type', info.type)
                 suc = info.type 
-                console.log('len', res.rewards.length)
+
                 for (var i=0; i < res.rewards.length; i++) {
                     console.log('qty', res.rewards[i].quantity)
                     const qty = res.rewards[i].quantity
                     const type = res.rewards[i].type
-                    if (type == "dec") 
-                        summary.dec_total += qty
-                    else if (type == "pack") 
-                        summary.pack_total += qty
-                    else if (type == "reward_card") 
-                        summary.card_total += qty
+                    if (type == kind) 
+                        sum += qty
                 }
             }
             var ret = 'fail'
             if (suc != 'fail') 
-                ret = suc + " dec : " + String(summary.dec_total) + " card : " + String(summary.card_total) + " pack : " + String(summary.pack_total)
+                ret = sum
 
-            console.log(summary)
             return (
                 ret
             );
@@ -114,7 +106,6 @@
                         <button onClick={onReward}> Reward</button>
                     </div>
                     <hr />
-
                     {
                         loading < 2 ? (
                             loading == 1?
@@ -124,29 +115,61 @@
                     }
                     {
                         loading == 2 ? (
-                            <ul>
-                                {infos.map((info, index) => (
-                                    <li key={index}>{info.token} : {info.balance}</li>
-                                ))}
-                            </ul>
+                            <table border="1" align="center">
+                                <thead>
+                                    <th> Type </th>
+                                    <th> Qty </th>
+                                </thead>
+                                <tbody>
+                                    {infos.map((info, index) => (
+                                        <tr key={index} align="center"> <td> {info.token} </td>  <td> {info.balance} </td> </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+
                         ) : 
                         (loading == 3 ? (
-                                <ul>
-                                    {infos.map((info, index) => (
-                                            <li key={index} style={{color: info.purchaser==account?'red':'blue'}}>{new Date(info.completed_date).toLocaleString()}  {info.purchaser==account? 'BUY ' : 'SELL'}  :  {cardInfos[info.card_detail_id - 1].name}   ${info.buy_price}</li>
-                                    ))}
-                                </ul>
+                            <table border="1" align="center">
+                                    <thead>
+                                        <th> Date </th>
+                                        <th> TYPE </th>
+                                        <th> CARD </th>
+                                        <th> PRICE($) </th>
+                                    </thead>
+                                    <tbody>
+                                        {infos.map((info, index) => (
+                                                <tr key={index} align="center" style={{color: info.purchaser==account?'red':'blue'}}> 
+                                                    <td> {new Date(info.completed_date).toLocaleString()}  </td>
+                                                    <td> {info.purchaser==account? 'BUY ' : 'SELL'}  </td>
+                                                    <td> {cardInfos[info.card_detail_id - 1].name} </td>
+                                                    <td> {info.buy_price} </td>
+                                                </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                         ): 
                         (loading == 4 ? (
                             rewardInfos.length > 0 ? (
-                                <ul>
-                                    {rewardInfos.map((info, index) => (
-                                            info.success ? 
-                                                <li key={index} > {new Date(info.created_date).toLocaleString()} <GetDetailRewardInfo data={info} /> </li>
-                                            :""
-
-                                    ))}
-                                </ul>
+                                <table border="1" align="center">
+                                    <thead>
+                                        <th> Date </th>
+                                        <th> DEC </th>
+                                        <th> CARD </th>
+                                        <th> PACK </th>
+                                    </thead>
+                                    <tbody>
+                                        {rewardInfos.map((info, index) => (
+                                                info.success ? 
+                                                    <tr  key={index} align="center"> 
+                                                        <td> {new Date(info.created_date).toLocaleString()} </td>
+                                                        <td> <GetDetailRewardInfo data={info} kind={"dec"}/> </td>
+                                                        <td> <GetDetailRewardInfo data={info} kind={"card_reward"}/> </td>
+                                                        <td> <GetDetailRewardInfo data={info} kind={"pack"}/> </td>
+                                                    </tr>
+                                                :""
+                                        ))}
+                                    </tbody>
+                                </table>
                             ):
                             <h5> No reward </h5>
                             ): ""
@@ -160,4 +183,4 @@
         <App />, root)
     </script>
     
-</html>        
+</html>
