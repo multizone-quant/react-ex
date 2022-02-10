@@ -14,8 +14,7 @@
     <script type="text/babel">
         const root = document.getElementById("root");
 
-//        function Test({data}, {index}) {
-        function Test({data}) {
+        function GetDetailRewardInfo({data}) {
             const res = JSON.parse(data.result)
             const info = JSON.parse(data.data)
 
@@ -40,10 +39,6 @@
             );
         }
         function App() {
-            var d = "{\"success\":true}"
-            const res = JSON.parse(d)
-            console.log(res)
-
             const [loading, setLoading] = React.useState(-1);
             const [infos, setInfos] = React.useState([]);
             const [cardInfos, setCardInfos] = React.useState([]);
@@ -61,12 +56,6 @@
                     setInfos(json);
                 });
             };
-
-            let ecr = "2022-02-09T12:16:45.000Z"
-            let today = new Date(ecr)
-//            var today = Date.now();
-            console.log(today.toLocaleString());
-            console.log(new Date(ecr).toLocaleString());
 
             const onTrading = (event) => {
                 const url = "https://api2.splinterlands.com/market/history?player="
@@ -143,7 +132,7 @@
                             rewardInfos.length > 0 ? (
                                 <ul>
                                     {rewardInfos.map((info, index) => (
-                                            <li key={index} > {new Date(info.created_date).toLocaleString()} <Test data={info} /> </li>
+                                            <li key={index} > {new Date(info.created_date).toLocaleString()} <GetDetailRewardInfo data={info} /> </li>
 
                                     ))}
                                 </ul>
