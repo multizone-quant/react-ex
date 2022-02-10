@@ -14,12 +14,42 @@
     <script type="text/babel">
         const root = document.getElementById("root");
 
+//        function Test({data}, {index}) {
+        function Test({data}) {
+            const res = JSON.parse(data.result)
+            const info = JSON.parse(data.data)
+
+            var summary = { dec_total : 0, pack_total:0, card_total:0}
+
+            console.log('len', res.rewards.length)
+            for (var i=0; i < res.rewards.length; i++) {
+                console.log('qty', res.rewards[i].quantity)
+                const qty = res.rewards[i].quantity
+                const type = res.rewards[i].type
+                if (type=="dec") 
+                    summary.dec_total += qty
+                else if (type=="pack") 
+                    summary.pack_total += qty
+                else if (type=="reward card") 
+                    summary.card_total += qty
+            }
+
+            console.log(summary)
+            return (
+                info.type + " dec : " + String(summary.dec_total) + " card : " + String(summary.card_total) + " pack : " + String(summary.pack_total)
+            );
+        }
         function App() {
+            var d = "{\"success\":true}"
+            const res = JSON.parse(d)
+            console.log(res)
+
             const [loading, setLoading] = React.useState(-1);
             const [infos, setInfos] = React.useState([]);
             const [cardInfos, setCardInfos] = React.useState([]);
+            const [rewardInfos, setRewardInfos] = React.useState([]);
 
-            const [account, setAccount] = React.useState("");
+            const [account, setAccount] = React.useState("tradingideas");
             const onChange = (event) => setAccount(event.target.value);
 
             const onBalance = (event) => {
@@ -32,13 +62,29 @@
                 });
             };
 
+            let ecr = "2022-02-09T12:16:45.000Z"
+            let today = new Date(ecr)
+//            var today = Date.now();
+            console.log(today.toLocaleString());
+            console.log(new Date(ecr).toLocaleString());
+
             const onTrading = (event) => {
-                const sm_balance = "https://api2.splinterlands.com/market/history?player="
-                fetch(sm_balance+account)
+                const url = "https://api2.splinterlands.com/market/history?player="
+                fetch(url+account)
                 .then((response) => response.json())
                 .then((json) => {
                     setInfos(json);
                     setLoading(3); // 3 : loading 완료
+                });
+            };
+
+            const onReward = (event) => {
+                const url = "https://api.steemmonsters.io/players/history?from_block=-1&limit=250&types=card_award,claim_reward&username="
+                fetch(url+account)
+                .then((response) => response.json())
+                .then((json) => {
+                    setRewardInfos(json);
+                    setLoading(4); // 4 : loading 완료
                 });
             };
 
@@ -66,7 +112,8 @@
                         />
                         <hr />
                         <button onClick={onBalance}> Balance</button>
-                        <button onClick={onTrading}> Trade Info</button>
+                        <button onClick={onTrading}> Trade</button>
+                        <button onClick={onReward}> Reward</button>
                     </div>
                     <hr />
 
@@ -84,14 +131,26 @@
                                     <li key={index}>{info.token} : {info.balance}</li>
                                 ))}
                             </ul>
-                        ) : (loading == 3 ? (
+                        ) : 
+                        (loading == 3 ? (
                                 <ul>
                                     {infos.map((info, index) => (
                                             <li key={index} style={{color: info.purchaser==account?'red':'blue'}}>{new Date(info.completed_date).toLocaleString()}  {info.purchaser==account? 'BUY ' : 'SELL'}  :  {cardInfos[info.card_detail_id - 1].name}   ${info.buy_price}</li>
                                     ))}
                                 </ul>
+                        ): 
+                        (loading == 4 ? (
+                            rewardInfos.length > 0 ? (
+                                <ul>
+                                    {rewardInfos.map((info, index) => (
+                                            <li key={index} > {new Date(info.created_date).toLocaleString()} <Test data={info} /> </li>
+
+                                    ))}
+                                </ul>
+                            ):
+                            <h5> No reward </h5>
                             ): ""
-                        ) 
+                        )) 
                     }
                 </div>
             );
