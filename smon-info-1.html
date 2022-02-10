@@ -1,0 +1,163 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+    <body>
+        <div id="root"></div>
+    </body>
+
+    <!-- 
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    -->
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+        const root = document.getElementById("root");
+
+        function GetDetailRewardInfo({data}) {
+            var summary = { dec_total : 0, pack_total:0, card_total:0}
+            console.log(data.success)
+            var suc = 'fail'
+            if (data.success ) {
+                console.log('true')
+                const res = JSON.parse(data.result)
+                const info = JSON.parse(data.data)
+                console.log('type', info.type)
+                suc = info.type 
+                console.log('len', res.rewards.length)
+                for (var i=0; i < res.rewards.length; i++) {
+                    console.log('qty', res.rewards[i].quantity)
+                    const qty = res.rewards[i].quantity
+                    const type = res.rewards[i].type
+                    if (type == "dec") 
+                        summary.dec_total += qty
+                    else if (type == "pack") 
+                        summary.pack_total += qty
+                    else if (type == "reward_card") 
+                        summary.card_total += qty
+                }
+            }
+            var ret = 'fail'
+            if (suc != 'fail') 
+                ret = suc + " dec : " + String(summary.dec_total) + " card : " + String(summary.card_total) + " pack : " + String(summary.pack_total)
+
+            console.log(summary)
+            return (
+                ret
+            );
+        }
+
+        function App() {
+            const [loading, setLoading] = React.useState(-1);
+            const [infos, setInfos] = React.useState([]);
+            const [cardInfos, setCardInfos] = React.useState([]);
+            const [rewardInfos, setRewardInfos] = React.useState([]);
+
+            const [account, setAccount] = React.useState("");
+            const onChange = (event) => setAccount(event.target.value);
+
+            const onBalance = (event) => {
+                const sm_balance = "https://api2.splinterlands.com/players/balances?username="
+                fetch(sm_balance+account)
+                .then((response) => response.json())
+                .then((json) => {
+                    setLoading(2); // 2 : loading 완료
+                    setInfos(json);
+                });
+            };
+
+            const onTrading = (event) => {
+                const url = "https://api2.splinterlands.com/market/history?player="
+                fetch(url+account)
+                .then((response) => response.json())
+                .then((json) => {
+                    setInfos(json);
+                    setLoading(3); // 3 : loading 완료
+                });
+            };
+
+            const onReward = (event) => {
+                const url = "https://api.steemmonsters.io/players/history?from_block=-1&limit=250&types=card_award,claim_reward&username="
+                fetch(url+account)
+                .then((response) => response.json())
+                .then((json) => {
+                    setRewardInfos(json);
+                    setLoading(4); // 4 : loading 완료
+                });
+            };
+
+            // run once at the first time
+            React.useEffect(() => {
+                const url = "https://steemmonsters.com/cards/get_details"
+                fetch(url)
+                .then((response) => response.json())
+                .then((json) => {
+                    setCardInfos(json);
+                });
+            }, []);
+
+            return (
+                <div>
+                    <h1 style={{ color: 'black',textAlign: 'center' }}> Market Transactions History </h1>
+                    <div align="center">
+                        <input
+                            position="center"
+                            onChange={onChange}
+                            value={account}
+                            type="text"
+                            placeholder="Enter account..."
+                            style={{textAlign: 'center' }}
+                        />
+                        <hr />
+                        <button onClick={onBalance}> Balance</button>
+                        <button onClick={onTrading}> Trade</button>
+                        <button onClick={onReward}> Reward</button>
+                    </div>
+                    <hr />
+
+                    {
+                        loading < 2 ? (
+                            loading == 1?
+                                <strong>Loading...</strong>
+                            : ""  
+                        ) : ""
+                    }
+                    {
+                        loading == 2 ? (
+                            <ul>
+                                {infos.map((info, index) => (
+                                    <li key={index}>{info.token} : {info.balance}</li>
+                                ))}
+                            </ul>
+                        ) : 
+                        (loading == 3 ? (
+                                <ul>
+                                    {infos.map((info, index) => (
+                                            <li key={index} style={{color: info.purchaser==account?'red':'blue'}}>{new Date(info.completed_date).toLocaleString()}  {info.purchaser==account? 'BUY ' : 'SELL'}  :  {cardInfos[info.card_detail_id - 1].name}   ${info.buy_price}</li>
+                                    ))}
+                                </ul>
+                        ): 
+                        (loading == 4 ? (
+                            rewardInfos.length > 0 ? (
+                                <ul>
+                                    {rewardInfos.map((info, index) => (
+                                            info.success ? 
+                                                <li key={index} > {new Date(info.created_date).toLocaleString()} <GetDetailRewardInfo data={info} /> </li>
+                                            :""
+
+                                    ))}
+                                </ul>
+                            ):
+                            <h5> No reward </h5>
+                            ): ""
+                        )) 
+                    }
+                </div>
+            );
+        }
+
+        ReactDOM.render(
+        <App />, root)
+    </script>
+    
+</html>        
