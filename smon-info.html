@@ -80,7 +80,7 @@
 
             // run once at the first time
             React.useEffect(() => {
-                const url = "https://steemmonsters.com/cards/get_details"
+                const url = "https://api2.splinterlands.com/cards/get_details"
                 fetch(url)
                 .then((response) => response.json())
                 .then((json) => {
