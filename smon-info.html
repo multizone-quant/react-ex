@@ -14,6 +14,16 @@
     <script type="text/babel">
         const root = document.getElementById("root");
 
+        function GetRewardType({data}) {
+            const info = JSON.parse(data.data)
+            if (info.type == 'quest')
+                return 'quest'
+            else if (info.type == 'league_season')
+                return 'season'
+            else 
+                return 'unknown'
+        }
+
         function GetDetailRewardInfo({data, kind}) {
             var sum = 0
             var suc = 'fail'
@@ -154,6 +164,7 @@
                                 <table border="1" align="center"  cellpadding="1">
                                     <thead>
                                         <th> Date </th>
+                                        <th> TYPE </th>
                                         <th> DEC </th>
                                         <th> CARD </th>
                                         <th> PACK </th>
@@ -163,6 +174,7 @@
                                                 info.success ? 
                                                     <tr  key={index} align="center"> 
                                                         <td> {new Date(info.created_date).toLocaleString()} </td>
+                                                        <td> <GetRewardType data={info}/> </td>
                                                         <td> <GetDetailRewardInfo data={info} kind={"dec"}/> </td>
                                                         <td> <GetDetailRewardInfo data={info} kind={"reward_card"}/> </td>
                                                         <td> <GetDetailRewardInfo data={info} kind={"pack"}/> </td>
