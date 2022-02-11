@@ -14,6 +14,81 @@
     <script type="text/babel">
         const root = document.getElementById("root");
 
+        function GetRemain({data}) {
+            const today = new Date();
+            const start  = new Date(data.rental_date)
+            const end  = new Date(data.next_rental_payment)
+            var diff = (end - today)/1000  // diff by sec
+
+            const hour = diff/3600
+            const min = diff/60
+
+            var d = ''
+            var h = ''
+            if (hour > 1) 
+                h = hour.toFixed(1) + 'h '
+            else 
+                h = min.toFixed(1) + 'm'
+
+            // next_rental_payment is not end of rent time but the next payment time 
+            // need to calculate based on  rental_days and next_rental_payment
+            var ret = ''
+
+            if ( data.cancel_player || data.rental_days < 2 )
+                ret = h 
+            else {
+                const st  = start.getTime() / 1000  // convert to sec
+                const td  = today.getTime() / 1000
+                const diff_day = (td - st)/(24*3600)
+                const remain_day = data.rental_days - diff_day
+
+                if (remain_day > 1.0)
+                    ret = remain_day.toFixed(1) + 'd '
+                else 
+                    ret = h
+            }
+            return (
+                ret
+            );
+        }
+
+        function GetCardName({data, id}) {
+            console.log(data, id)
+            var name
+            if (data.length == 0)
+                name = String(id)
+            else 
+                name = data[id-1].name
+
+            return (
+                name
+            );
+        }
+        function TestArgs(kind) {
+            console.log('TestArgs', kind)
+        }
+        function TestArgs2({kind}) {
+            console.log('TestArgs2', kind)
+        }
+        function GetDetailRewardInfoTr({data, kind}) {
+            var cnt = GetDetailRewardInfoGen(data, kind)
+            var col = 'black'
+            if (kind == 'pack' && cnt > 0)
+                col = 'red'
+            
+//            var ret = '<td style={{color:"' + color + '"}}> ' + String(cnt) + '</td>'
+//              <td  style={{color: "red"}}> Test </td>                                                        
+            var ret = '<td>' + String(cnt) + '</td>'
+            if (cnt > 0)
+                return (<td style={{color:"red"}}> {cnt}</td>);
+            else 
+                return (<td> {cnt}</td>);
+        }
+
+        function GetDetailRewardInfo({data, kind}) {
+            return GetDetailRewardInfoGen(data, kind)
+        }
+
         function GetRewardType({data}) {
             const info = JSON.parse(data.data)
             if (info.type == 'quest')
@@ -24,7 +99,7 @@
                 return 'unknown'
         }
 
-        function GetDetailRewardInfo({data, kind}) {
+        function GetDetailRewardInfoGen(data, kind) {
             var sum = 0
             var suc = 'fail'
             if (data.success ) {
@@ -33,7 +108,6 @@
                 suc = info.type 
 
                 for (var i=0; i < res.rewards.length; i++) {
-                    console.log('qty', res.rewards[i].quantity)
                     const qty = res.rewards[i].quantity
                     const type = res.rewards[i].type
                     if (type == kind) 
@@ -43,8 +117,8 @@
             var ret = 'fail'
             if (suc != 'fail') 
                 ret = sum
-                if (ret == 0) 
-                    ret = ''            
+                if (ret == 0)
+                    ret = ''
             return (
                 ret
             );
@@ -55,9 +129,15 @@
             const [infos, setInfos] = React.useState([]);
             const [cardInfos, setCardInfos] = React.useState([]);
             const [rewardInfos, setRewardInfos] = React.useState([]);
+            const [rentInfos, setRentInfos] = React.useState([]);
+            const [activeRentingInfos, setActiveRentingInfos] = React.useState([]);
 
-            const [account, setAccount] = React.useState("");
-            const onChange = (event) => setAccount(event.target.value);
+            const [account, setAccount] = React.useState(["marabara"]);
+
+
+            const onChange = (event) => {
+                setAccount(event.target.value);
+            };
 
             const onBalance = (event) => {
                 const sm_balance = "https://api2.splinterlands.com/players/balances?username="
@@ -66,6 +146,29 @@
                 .then((json) => {
                     setLoading(2); // 2 : loading 완료
                     setInfos(json);
+                });
+            };
+
+            // card renting info from other
+            const onActiveRenting = (event) => {
+                setLoading(1); // 1 : loading
+                const url = "https://api2.splinterlands.com/market/active_rentals?renter="
+                fetch(url+account)
+                .then((response) => response.json())
+                .then((json) => {
+                    setLoading(6); // 6 : loading 완료
+                    setActiveRentingInfos(json);
+                });
+            };
+
+            const onRental = (event) => {
+                setLoading(1); // 1 : loading
+                const url = "https://api2.splinterlands.com/market/rental_history?player="
+                fetch(url+account)
+                .then((response) => response.json())
+                .then((json) => {
+                    setLoading(5); // 5 : loading 완료
+                    setRentInfos(json);
                 });
             };
 
@@ -98,23 +201,31 @@
                     setCardInfos(json);
                 });
             }, []);
+//                                                         <td> <GetDetailRewardInfo data={info} kind={"pack"}/> </td>
 
             return (
                 <div>
-                    <h1 style={{ color: 'black',textAlign: 'center' }}> Market Transactions History </h1>
+                    <h1 style={{ color: 'black',textAlign: 'center' }}> Steem Monster Information </h1>
                     <div align="center">
                         <input
                             position="center"
                             onChange={onChange}
                             value={account}
                             type="text"
+                            height= "100px"
                             placeholder="Enter account..."
-                            style={{textAlign: 'center' }}
+                            style={{textAlign: 'center', font: '16pt'}}
                         />
                         <hr />
-                        <button onClick={onBalance}> Balance</button> <h100></h100>
-                        <button onClick={onTrading}> Trade</button> <h100></h100>
-                        <button onClick={onReward}> Reward</button>
+                            <h4> History  : &nbsp;  &nbsp;
+                            <button onClick={onTrading}> Trade</button> &nbsp;&nbsp;
+                            <button onClick={onReward}> Reward</button> &nbsp;&nbsp;
+                            <button onClick={onRental}> Rental</button> &nbsp;&nbsp;
+
+                            &nbsp;&nbsp;&nbsp;&nbsp;Status &nbsp;  &nbsp;
+                            <button onClick={onBalance}> Balance</button> <h100></h100>
+                            <button onClick={onActiveRenting}> Active Renting</button> <h100></h100>
+                            </h4>
                     </div>
                     <hr />
                     {
@@ -126,7 +237,7 @@
                     }
                     {
                         loading == 2 ? (
-                            <table border="1" align="center"  cellpadding="1">
+                            <table border="1" align="center">
                                 <thead>
                                     <th> Type </th>
                                     <th> Qty </th>
@@ -140,9 +251,9 @@
 
                         ) : 
                         (loading == 3 ? (
-                            <table border="1" align="center" cellpadding="1">
+                            <table border="1" align="center">
                                     <thead>
-                                        <th> Date </th>
+                                        <th> DATE </th>
                                         <th> TYPE </th>
                                         <th> CARD </th>
                                         <th> PRICE($) </th>
@@ -152,16 +263,87 @@
                                                 <tr key={index} align="center" style={{color: info.purchaser==account?'red':'blue'}}> 
                                                     <td> {new Date(info.completed_date).toLocaleString()}  </td>
                                                     <td> {info.purchaser==account? 'BUY ' : 'SELL'}  </td>
-                                                    <td> {cardInfos[info.card_detail_id - 1].name} </td>
+                                                    <td> <GetCardName data={cardInfos} id={info.card_detail_id} /> </td>
                                                     <td> {info.buy_price} </td>
                                                 </tr>
                                         ))}
                                     </tbody>
                                 </table>
                         ): 
+                        (loading == 5 ? (
+                            <table border="1" align="center">
+                                    <thead>
+                                        <th> # </th>
+                                        <th> RENT DATE </th>
+                                        <th> OWNER </th>
+                                        <th> RENTER </th>
+                                        <th> CARD </th>
+                                        <th> XP </th>
+                                        <th> GOLD </th>
+                                        <th> PAY </th>
+                                        <th> PAID </th>
+                                        <th> UNTIL </th>
+                                        <th> REMAIN </th>
+                                    </thead>
+                                    <tbody>
+                                        {rentInfos.map((info, index) => (
+                                                <tr key={index} align="center" style={{color: info.seller==account?'red':'blue'}}> 
+                                                    <td> {index+1}  </td>
+                                                    <td> {new Date(info.rental_date).toLocaleString()}  </td>
+                                                    <td> {info.seller}  </td>
+                                                    <td> {info.renter}  </td>
+                                                    <td> <GetCardName data={cardInfos} id={info.card_detail_id} /> </td>
+                                                    <td> {info.xp} </td>
+                                                    <td> {info.gold? 'G' : ''} </td>
+                                                    <td> {info.payment_currency} </td>
+                                                    <td> {info.buy_price} </td>
+                                                    <td> {new Date(info.next_rental_payment).toLocaleString()} </td>
+                                                    <td> <GetRemain data={info} /> </td>
+                                                </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                        ):
+                        (loading == 6 ? ( //active renting info
+                            activeRentingInfos.length > 0 ? (
+                                <table border="1" align="center">
+                                    <thead>
+                                        <th> # </th>
+                                        <th> RENT DATE </th>
+                                        <th> OWNER </th>
+                                        <th> CARD </th>
+                                        <th> XP </th>
+                                        <th> GOLD </th>
+                                        <th> PAY </th>
+                                        <th> PAID </th>
+                                        <th> UNTIL </th>
+                                        <th> REMAIN </th>
+                                        <th> CANCELLED </th>
+                                    </thead>
+                                    <tbody>
+                                        {activeRentingInfos.map((info, index) => (
+                                                <tr key={index} align="center" style={{color: info.seller==account?'red':'blue'}}> 
+                                                    <td> {index+1}  </td>
+                                                    <td> {new Date(info.rental_date).toLocaleString()}  </td>
+                                                    <td> {info.seller}  </td>
+                                                    <td> <GetCardName data={cardInfos} id={info.card_detail_id} /> </td>
+                                                    <td> {info.xp} </td>
+                                                    <td> {info.gold? 'G' : ''} </td>
+                                                    <td> {info.payment_currency} </td>
+                                                    <td> {info.buy_price} </td>
+                                                    <td> {new Date(info.next_rental_payment).toLocaleString()} </td>
+                                                    <td> <GetRemain data={info} /> </td>
+                                                    <td> {info.cancel_player} </td>
+                                                </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ):
+                            <h5> No Renting Info </h5>
+                        ):
                         (loading == 4 ? (
                             rewardInfos.length > 0 ? (
-                                <table border="1" align="center"  cellpadding="1">
+                                <table border="1" align="center" cellpadding="1">
                                     <thead>
                                         <th> Date </th>
                                         <th> TYPE </th>
@@ -177,7 +359,7 @@
                                                         <td> <GetRewardType data={info}/> </td>
                                                         <td> <GetDetailRewardInfo data={info} kind={"dec"}/> </td>
                                                         <td> <GetDetailRewardInfo data={info} kind={"reward_card"}/> </td>
-                                                        <td> <GetDetailRewardInfo data={info} kind={"pack"}/> </td>
+                                                        <GetDetailRewardInfoTr data={info} kind={"pack"}/>
                                                     </tr>
                                                 :""
                                         ))}
@@ -186,7 +368,8 @@
                             ):
                             <h5> No reward </h5>
                             ): ""
-                        )) 
+                        )
+                        )))
                     }
                 </div>
             );
@@ -194,6 +377,5 @@
 
         ReactDOM.render(
         <App />, root)
-    </script>
-    
+    </script>   
 </html>
