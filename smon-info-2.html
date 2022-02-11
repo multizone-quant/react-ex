@@ -14,6 +14,16 @@
     <script type="text/babel">
         const root = document.getElementById("root");
 
+        function GetRewardType({data}) {
+            const info = JSON.parse(data.data)
+            if (info.type == 'quest')
+                return 'quest'
+            else if (info.type == 'league_season')
+                return 'season'
+            else 
+                return 'unknown'
+        }
+
         function GetDetailRewardInfo({data, kind}) {
             var sum = 0
             var suc = 'fail'
@@ -33,7 +43,8 @@
             var ret = 'fail'
             if (suc != 'fail') 
                 ret = sum
-
+                if (ret == 0) 
+                    ret = ''            
             return (
                 ret
             );
@@ -80,7 +91,7 @@
 
             // run once at the first time
             React.useEffect(() => {
-                const url = "https://steemmonsters.com/cards/get_details"
+                const url = "https://api2.splinterlands.com/cards/get_details"
                 fetch(url)
                 .then((response) => response.json())
                 .then((json) => {
@@ -101,8 +112,8 @@
                             style={{textAlign: 'center' }}
                         />
                         <hr />
-                        <button onClick={onBalance}> Balance</button>
-                        <button onClick={onTrading}> Trade</button>
+                        <button onClick={onBalance}> Balance</button> <h100></h100>
+                        <button onClick={onTrading}> Trade</button> <h100></h100>
                         <button onClick={onReward}> Reward</button>
                     </div>
                     <hr />
@@ -115,7 +126,7 @@
                     }
                     {
                         loading == 2 ? (
-                            <table border="1" align="center">
+                            <table border="1" align="center"  cellpadding="1">
                                 <thead>
                                     <th> Type </th>
                                     <th> Qty </th>
@@ -129,7 +140,7 @@
 
                         ) : 
                         (loading == 3 ? (
-                            <table border="1" align="center">
+                            <table border="1" align="center" cellpadding="1">
                                     <thead>
                                         <th> Date </th>
                                         <th> TYPE </th>
@@ -150,9 +161,10 @@
                         ): 
                         (loading == 4 ? (
                             rewardInfos.length > 0 ? (
-                                <table border="1" align="center">
+                                <table border="1" align="center"  cellpadding="1">
                                     <thead>
                                         <th> Date </th>
+                                        <th> TYPE </th>
                                         <th> DEC </th>
                                         <th> CARD </th>
                                         <th> PACK </th>
@@ -162,8 +174,9 @@
                                                 info.success ? 
                                                     <tr  key={index} align="center"> 
                                                         <td> {new Date(info.created_date).toLocaleString()} </td>
+                                                        <td> <GetRewardType data={info}/> </td>
                                                         <td> <GetDetailRewardInfo data={info} kind={"dec"}/> </td>
-                                                        <td> <GetDetailRewardInfo data={info} kind={"card_reward"}/> </td>
+                                                        <td> <GetDetailRewardInfo data={info} kind={"reward_card"}/> </td>
                                                         <td> <GetDetailRewardInfo data={info} kind={"pack"}/> </td>
                                                     </tr>
                                                 :""
