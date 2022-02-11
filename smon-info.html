@@ -214,18 +214,19 @@
                             type="text"
                             height= "100px"
                             placeholder="Enter account..."
-                            style={{textAlign: 'center', font: '16pt'}}
+                            style={{height: 40, textAlign: 'center'}}
                         />
                         <hr />
-                            <h4> History  : &nbsp;  &nbsp;
-                            <button onClick={onTrading}> Trade</button> &nbsp;&nbsp;
-                            <button onClick={onReward}> Reward</button> &nbsp;&nbsp;
-                            <button onClick={onRental}> Rental</button> &nbsp;&nbsp;
+                        <h4> History  : &nbsp;  &nbsp;
+                            <button style={{height: 30, marginRight:10}} onClick={onTrading}> Trade</button> 
+                            <button style={{height: 30, marginRight:10}} onClick={onReward}> Reward</button>
+                            <button style={{height: 30, marginRight:50}} onClick={onRental}> Rental</button>
 
-                            &nbsp;&nbsp;&nbsp;&nbsp;Status &nbsp;  &nbsp;
-                            <button onClick={onBalance}> Balance</button> <h100></h100>
-                            <button onClick={onActiveRenting}> Active Renting</button> <h100></h100>
-                            </h4>
+                            Status &nbsp;  &nbsp;
+                            <button style={{height: 30, marginRight:10}} onClick={onBalance}> Balance</button> <h100></h100>
+                            <button style={{height: 30, marginRight:10}} onClick={onActiveRenting}> Active Renting</button> <h100></h100>
+                            <button style={{height: 30}} onClick={onActiveRented}> Active Rented</button> <h100></h100>
+                        </h4>
                     </div>
                     <hr />
                     {
