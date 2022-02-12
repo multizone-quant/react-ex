@@ -147,6 +147,7 @@
             const [loading, setLoading] = React.useState(-1);
             const [infos, setInfos] = React.useState([]);
             const [cardInfos, setCardInfos] = React.useState([]);
+            const [smonInfos, setSmonInfos] = React.useState([]);                                                     
             const [rewardInfos, setRewardInfos] = React.useState([]);
             const [rentInfos, setRentInfos] = React.useState([]);
             const [activeRentingInfos, setActiveRentingInfos] = React.useState([]);
@@ -230,6 +231,13 @@
 
             // run once at the first time
             React.useEffect(() => {
+                var  url = "https://api2.splinterlands.com/settings"
+                fetch(url)
+                .then((response) => response.json())
+                .then((json) => {
+                    setSmonInfos(json);
+                });
+                
                 const url = "https://api2.splinterlands.com/cards/get_details"
                 fetch(url)
                 .then((response) => response.json())
@@ -241,6 +249,19 @@
 
             return (
                 <div>
+                    <div>
+                        <table align="left">
+                            <tbody>
+                                <tr>
+                                    <td> DEC: {smonInfos.dec_price} &nbsp;</td> 
+                                </tr>
+                                <tr>
+                                    <td> SPS: {smonInfos.sps_price} &nbsp;</td> 
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                     <h1 style={{ color: 'black',textAlign: 'center' }}> Steem Monster Information </h1>
                     <div align="center">
                         <input
