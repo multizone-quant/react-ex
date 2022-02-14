@@ -363,6 +363,7 @@
                                 </table>
                         ): 
                         (loading == 5 ? (  // rental history
+                            activeRentingInfos.length > 0 ? (
                             <table border="1" align="center">
                                     <thead>
                                         <th> # </th>
@@ -395,6 +396,7 @@
                                         ))}
                                     </tbody>
                                 </table>
+                            ): <h1 style={{ color: 'black',textAlign: 'center' }}> No Rental History</h1>
                         ):
                         (loading == 6 ? ( //active renting info
                             activeRentingInfos.length > 0 ? (
@@ -435,7 +437,7 @@
                                     </table>
                                 </div>
                             ):
-                            <h1 style={{ color: 'black',textAlign: 'center' }}> No Rented Info </h1>
+                            <h1 style={{ color: 'black',textAlign: 'center' }}> No Renting Info </h1>
                         ):
                         (loading == 7 ? ( //active rented info
                             activeRentingInfos.length > 0 ? (
@@ -502,7 +504,7 @@
                                     </tbody>
                                 </table>
                             ):
-                            <h5 style={{ color: 'black',textAlign: 'center' }}> No reward </h5>
+                            <h1 style={{ color: 'black',textAlign: 'center' }}> No Rented Info </h1>
                             ): ""
                         )
                         ))))
