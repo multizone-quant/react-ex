@@ -421,7 +421,7 @@
                                         </thead>
                                         <tbody>
                                             {activeRentingInfos.map((info, index) => (
-                                                    <tr key={index} align="center" style={{color: info.seller==account?'red':'blue'}}> 
+                                                    <tr key={index} align="center" > 
                                                         <td> &nbsp; {index+1}  &nbsp; </td>
                                                         <td> &nbsp; {new Date(info.rental_date).toLocaleString()}  &nbsp; </td>
                                                         <td> &nbsp; {info.seller}  &nbsp; </td>
@@ -461,7 +461,7 @@
                                         </thead>
                                         <tbody>
                                             {activeRentingInfos.map((info, index) => (
-                                                    <tr key={index} align="center" style={{color: info.seller==account?'red':'blue'}}> 
+                                                    <tr key={index} align="center"> 
                                                         <td> &nbsp; {index+1}  &nbsp; </td>
                                                         <td> &nbsp; {new Date(info.rental_date).toLocaleString()}  &nbsp; </td>
                                                         <td> &nbsp; {info.renter}  &nbsp; </td>
