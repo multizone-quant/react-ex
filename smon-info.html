@@ -274,19 +274,31 @@
             return (
                 <div>
                     <div>
-                        <table align="left">
+                        <table  border="0.5" align="left">
+                            <tbody>
+                                <tr>
+                                    <td> DEC</td> <td>  ${smonInfos.dec_price} &nbsp;</td> 
+                                </tr>                                    
+                                <tr>
+                                    <td> SPS</td> <td>  ${smonInfos.sps_price} &nbsp;</td> 
+                                </tr>
+                                <tr>
+                                    <td> </td> <td> </td> 
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <table  border="0.5" align="right">
                             <tbody>
                                 <tr>
                                     <td> STEEM </td> <td> \<GetPriceFromUpbit data={upbitInfos} coin='KRW-STEEM'/> </td>
-                                    <td> &nbsp;DEC</td> <td>  ${smonInfos.dec_price} &nbsp;</td> 
                                 </tr>                                    
                                 <tr>
                                     <td> SBD</td> <td>  \<GetPriceFromUpbit data={upbitInfos} coin='KRW-SBD'/> </td>
-                                    <td> &nbsp;SPS</td> <td>  ${smonInfos.sps_price} &nbsp;</td> 
                                 </tr>
                                 <tr>
                                     <td> HIVE</td> <td>  \<GetPriceFromUpbit data={upbitInfos} coin='KRW-HIVE'/> </td>
-                                    <td> </td> <td> </td> 
                                 </tr>
                             </tbody>
                         </table>
