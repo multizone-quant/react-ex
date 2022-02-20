@@ -348,7 +348,7 @@
                                     {infos.map((info, index) => (
                                         info.balance ? ( 
                                             <tr key={index} align="center"> 
-                                                <td> &nbsp;{index} &nbsp;</td>  
+                                                <td> &nbsp;{index+1} &nbsp; </td>
                                                 <td> &nbsp;{info.token} &nbsp;</td>  
                                                 <td> &nbsp;{info.balance>1000?( Math.round(info.balance).toLocaleString()):info.balance} &nbsp;</td> 
                                             </tr>
