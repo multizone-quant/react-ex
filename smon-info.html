@@ -340,9 +340,9 @@
                         loading == 2 ? (  // balance
                             <table border="1" align="center">
                                 <thead>
-                                    <th> No </th>
-                                    <th> Type </th>
-                                    <th> Qty </th>
+                                    <th> NO </th>
+                                    <th> TYPE </th>
+                                    <th> QTY </th>
                                 </thead>
                                 <tbody>
                                     {infos.map((info, index) => (
@@ -361,6 +361,7 @@
                         (loading == 3 ? (  // trading info
                             <table border="1" align="center">
                                     <thead>
+                                        <th> NO </th>
                                         <th> DATE </th>
                                         <th> TYPE </th>
                                         <th> CARD </th>
@@ -369,6 +370,7 @@
                                     <tbody>
                                         {infos.map((info, index) => (
                                                 <tr key={index} align="center" style={{color: info.purchaser==account?'red':'blue'}}> 
+                                                    <td> &nbsp;{index+1} &nbsp; </td>                                                    
                                                     <td> &nbsp; {new Date(info.completed_date).toLocaleString()} &nbsp; </td>
                                                     <td> &nbsp;{info.purchaser==account? 'BUY ' : 'SELL'}  &nbsp;</td>
                                                     <td> &nbsp;<GetCardName data={cardInfos} id={info.card_detail_id} /> &nbsp;</td>
